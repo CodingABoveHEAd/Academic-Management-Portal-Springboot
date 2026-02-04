@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enrollment - Student Portal</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body { background-color: #f5f7fa; }
+        .sidebar {
+            background: linear-gradient(180deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            position: fixed;
+            width: 250px;
+            padding-top: 20px;
+        }
+        .sidebar .nav-link {
+            color: rgba(255,255,255,0.8);
+            padding: 15px 25px;
+            margin: 5px 15px;
+            border-radius: 10px;
+            transition: all 0.3s;
+        }
+        .sidebar .nav-link:hover, .sidebar .nav-link.active {
+            background: rgba(255,255,255,0.2);
+            color: white;
+        }
+        .sidebar .nav-link i { width: 25px; }
+        .main-content { margin-left: 250px; padding: 30px; }
+        .brand-logo {
+            color: white;
+            font-size: 24px;
+            font-weight: 700;
+            padding: 10px 25px 30px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .user-info {
+            background: rgba(255,255,255,0.1);
+            padding: 15px 25px;
+            margin: 20px 15px;
+            border-radius: 10px;
+        }
+        .user-info .name { color: white; font-weight: 600; }
+        .user-info .role { color: rgba(255,255,255,0.7); font-size: 0.85rem; }
+        .card { border: none; border-radius: 15px; box-shadow: 0 5px 20px rgba(0,0,0,0.08); }
+        .current-enrollment {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+        }
+        .course-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+            transition: transform 0.3s;
+            height: 100%;
+        }
+        .course-card:hover { transform: translateY(-5px); }
+        .course-card.enrolled {
+            border: 3px solid #38ef7d;
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="brand-logo">
+            <i class="fas fa-graduation-cap"></i>
+            <span>Student Portal</span>
+        </div>
+        <div class="user-info">
+            <div class="name" th:text="${username}">Username</div>
+            <div class="role">
+                <i class="fas fa-user-graduate me-1"></i>Student
+            </div>
+        </div>
+        <nav class="nav flex-column">
+            <a class="nav-link" th:href="@{/web/dashboard}"><i class="fas fa-home"></i> Dashboard</a>
+            <a class="nav-link" th:href="@{/web/departments}"><i class="fas fa-building"></i> Departments</a>
+            <a class="nav-link" th:href="@{/web/courses}"><i class="fas fa-book"></i> Courses</a>
+            <a class="nav-link active" th:href="@{/web/enrollment}"><i class="fas fa-clipboard-list"></i> Enrollment</a>
+            <a class="nav-link" th:href="@{/web/profile}"><i class="fas fa-user"></i> Profile</a>
+            <a class="nav-link text-danger" th:href="@{/logout}"><i class="fas fa-sign-out-alt"></i> Logout</a>
+        </nav>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="mb-4">
+            <h2 class="mb-1"><i class="fas fa-clipboard-list me-2"></i>Course Enrollment</h2>
+            <p class="text-muted mb-0">Enroll in a course (you can only be enrolled in one course at a time)</p>
+        </div>
+
+        <!-- Current Enrollment Status -->
+        <div th:if="${student.enrolledCourseName != null}" class="current-enrollment">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <h4><i class="fas fa-check-circle me-2"></i>Currently Enrolled</h4>
+                    <h2 class="mb-1" th:text="${student.enrolledCourseName}">Course Name</h2>
+                    <p class="mb-0">You are currently enrolled in this course.</p>
+                </div>
+                <div class="col-md-4 text-md-end">
+                    <button class="btn btn-light btn-lg" onclick="dropCourse()">
+                        <i class="fas fa-times me-2"></i>Drop Course
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div th:if="${student.enrolledCourseName == null}" class="alert alert-info mb-4">
+            <i class="fas fa-info-circle me-2"></i>
+            You are not enrolled in any course. Select a course below to enroll.
+        </div>
+
+        <h4 class="mb-3">Available Courses</h4>
+        <div class="row g-4">
+            <div class="col-md-4" th:each="course : ${courses}">
+                <div class="course-card" th:classappend="${student.enrolledCourseId == course.id} ? 'enrolled' : ''">
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                        <span class="badge bg-primary" th:text="${course.courseCode}">CSE101</span>
+                        <span th:if="${student.enrolledCourseId == course.id}" class="badge bg-success">
+                            <i class="fas fa-check me-1"></i>Enrolled
+                        </span>
+                    </div>
+                    <h5 th:text="${course.courseName}">Course Name</h5>
+                    <p class="text-muted small" th:text="${course.description ?: 'No description available'}">Description</p>
+                    <div class="d-flex gap-2 mb-3">
+                        <span class="badge bg-info"><i class="fas fa-star me-1"></i><span th:text="${course.credits}">3</span> Credits</span>
+                        <span class="badge bg-secondary"><i class="fas fa-building me-1"></i><span th:text="${course.departmentName ?: 'N/A'}">Dept</span></span>
+                    </div>
+                    <button th:if="${student.enrolledCourseName == null}"
+                            class="btn btn-primary w-100"
+                            onclick="enrollInCourse(this)"
+                            th:data-id="${course.id}">
+                        <i class="fas fa-plus me-2"></i>Enroll
+                    </button>
+                    <button th:if="${student.enrolledCourseId == course.id}"
+                            class="btn btn-outline-danger w-100"
+                            onclick="dropCourse()">
+                        <i class="fas fa-times me-2"></i>Drop Course
+                    </button>
+                    <button th:if="${student.enrolledCourseName != null and student.enrolledCourseId != course.id}"
+                            class="btn btn-secondary w-100" disabled>
+                        <i class="fas fa-lock me-2"></i>Drop current course first
+                    </button>
+                </div>
+            </div>
+            <div class="col-12" th:if="${#lists.isEmpty(courses)}">
+                <div class="card">
+                    <div class="card-body text-center py-5">
+                        <i class="fas fa-book fa-3x text-muted mb-3"></i>
+                        <h5>No Courses Available</h5>
+                        <p class="text-muted">There are no courses available for enrollment at this time.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function enrollInCourse(btn) {
+            const courseId = btn.getAttribute('data-id');
+            fetch('/api/enrollment', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ courseId: parseInt(courseId) })
+            })
+            .then(response => response.json())
+            .then(result => {
+                if (result.success) {
+                    location.reload();
+                } else {
+                    alert('Error: ' + result.message);
+                }
+            })
+            .catch(error => alert('Error: ' + error));
+        }
+
+        function dropCourse() {
+            if (confirm('Are you sure you want to drop this course?')) {
+                fetch('/api/enrollment', {
+                    method: 'DELETE'
+                })
+                .then(response => response.json())
+                .then(result => {
+                    if (result.success) {
+                        location.reload();
+                    } else {
+                        alert('Error: ' + result.message);
+                    }
+                })
+                .catch(error => alert('Error: ' + error));
+            }
+        }
+    </script>
+</body>
+</html>
