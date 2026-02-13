@@ -37,7 +37,7 @@ public class SecurityConfig {
         return new ProviderManager(authProvider);
     }
 
-    // API Security Filter Chain - for REST API with HTTP Basic
+    // API Security Filter Chain - for REST API with HTTP Basic and session support
     @Bean
     @Order(1)
     public SecurityFilterChain apiSecurityFilterChain(HttpSecurity http) throws Exception {
@@ -76,7 +76,7 @@ public class SecurityConfig {
 
                 .anyRequest().authenticated()
             )
-            .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+            .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
             .httpBasic(Customizer.withDefaults());
 
         return http.build();
