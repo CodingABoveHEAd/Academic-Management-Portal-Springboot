@@ -1,0 +1,6 @@
+Port 5432
+Database academic_management_portal_postgres
+Username academic_management_portal_postgres_user
+Password 5Cozwt9XQtnlp2UpstcBjp4j6T9I6Agc
+Internal Database URL postgresql://academic_management_portal_postgres_user:5Cozwt9XQtnlp2UpstcBjp4j6T9I6Agc@dpg-d6825i95pdvs73fptui0-a.singapore-postgres.render.com/academic_management_portal_postgres
+PSQL Command PGPASSWORD=5Cozwt9XQtnlp2UpstcBjp4j6T9I6Agc psql -h dpg-d6825i95pdvs73fptui0-a.singapore-postgres.render.com -U academic_management_portal_postgres_user academic_management_portal_postgres
