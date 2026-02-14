@@ -20,6 +20,9 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
+      - name: Give execute permission to mvnw
+        run: chmod +x mvnw
+
       - name: Cache Maven dependencies
         uses: actions/cache@v4
         with:
