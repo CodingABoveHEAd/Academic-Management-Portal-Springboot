@@ -4,10 +4,10 @@ services:
   postgres:
     image: postgres:15-alpine
     container_name: student_portal_db
-    # environment:
-      # POSTGRES_DB: student_portal
-      # POSTGRES_USER: postgres
-      # POSTGRES_PASSWORD: admin
+#     environment:
+#       POSTGRES_DB: student_portal
+#       POSTGRES_USER: postgres
+#       POSTGRES_PASSWORD: admin
     ports:
       - "5432:5432"
     volumes:
